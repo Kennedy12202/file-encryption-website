@@ -1,5 +1,3 @@
-import NextLogo from "./next-logo";
-import SupabaseLogo from "./supabase-logo";
 
 export default function Header() {
   return (
@@ -8,13 +6,10 @@ export default function Header() {
         <a
           href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
           target="_blank"
-          rel="noreferrer"
-        >
-          <SupabaseLogo />
+          rel="noreferrer">
         </a>
         <span className="border-l rotate-45 h-6" />
         <a href="https://nextjs.org/" target="_blank" rel="noreferrer">
-          <NextLogo />
         </a>
       </div>
       <h1 className="sr-only">Supabase and Next.js Starter Template</h1>
@@ -24,8 +19,7 @@ export default function Header() {
           href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
           target="_blank"
           className="font-bold hover:underline"
-          rel="noreferrer"
-        >
+          rel="noreferrer" >
           Supabase
         </a>{" "}
         and{" "}

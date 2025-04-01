@@ -59,10 +59,21 @@
   }
 }
 
-@layer base {
-  * {
+.flex gap-2 {
+  background-color: #6f7c68;
+  color: black;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 0 1rem;
+  gap: 2rem;
+}
+
+@layer components {
+  .flex {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
