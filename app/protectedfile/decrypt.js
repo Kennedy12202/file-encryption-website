@@ -18,7 +18,8 @@ async function getAnddecryptFile(cid, secKey) {
    const decryptedData = bytes.toString(CryptoJS.enc.Utf8) //convert to string
   
   
-
+   const bytes = CryptoJS.AES.decrypt(encryptedData, secKey) //AES decryption
+   c
 
    const decryptedFilePath = path.join(path.dirname(cid), `${path.basename(cid)}_decrypted`); //path to save the decrypted file
    fs.writeFileSync(decryptedFilePath, decryptedData); //write decrypted data to a new file
