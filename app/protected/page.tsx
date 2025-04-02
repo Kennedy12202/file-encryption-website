@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import FileUploader from "@/pages/encrypt.js"
+import FileUploader from "@/app/protectedfile/encAnddec.js"
 import { redirect } from "next/navigation";
 
 export default async function ProtectedPage() {
@@ -15,6 +15,7 @@ export default async function ProtectedPage() {
 
   return (
     <FileUploader/>
+
  
   );
 }
