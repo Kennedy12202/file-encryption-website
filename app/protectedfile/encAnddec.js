@@ -116,6 +116,12 @@ async function deleteFile(cid) {
 //allows the user to download the file from IPFS and decrypt it using the AES key 
 async function downloadAndDecrypt(cid, ivHex, keyHex) {
     try {
+        // Get the key from localStorage if not provided
+        const useKeyHex = keyHex || localStorage.getItem("aesKeyHex");
+        if (!useKeyHex) {
+            throw new Error("No encryption key found");
+        }
+
         const response = await fetch(`https://ipfs.io/ipfs/${cid}`);
         if (!response.ok) {
             throw new Error("Failed to fetch file from IPFS");
@@ -123,22 +129,25 @@ async function downloadAndDecrypt(cid, ivHex, keyHex) {
         const encryptedArrayBuffer = await response.arrayBuffer();
         const encryptedData = new Uint8Array(encryptedArrayBuffer);
 
-        const key = await importAESKey(keyHex);
+        const key = await importAESKey(useKeyHex);
         const decryptedBlob = await decryptFile(encryptedData, ivHex, key);
+
+        // Use original filename if available
+        const fileName = `decrypted_${cid.substring(0, 6)}`;
 
         const url = URL.createObjectURL(decryptedBlob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "decrypted_file";
+        a.download = fileName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     } catch (error) {
         console.error("Download and decryption failed:", error);
-        alert("Failed to download and decrypt file");
+        alert("Failed to download and decrypt file: " + error.message);
     }
 }
-
 
 export default function FileUploader() {
     const [aesKey, setAesKey] = useState(null);
@@ -163,9 +172,21 @@ export default function FileUploader() {
 
     useEffect(() => {
         (async () => {
-            const { key, keyHex } = await generateAESKey();
-            setAesKey(key);
-            setAesKeyHex(keyHex);
+            // Try to get existing key from localStorage
+            const storedKeyHex = localStorage.getItem("aesKeyHex");
+
+            if (storedKeyHex) {
+                // If key exists, import it
+                const key = await importAESKey(storedKeyHex);
+                setAesKey(key);
+                setAesKeyHex(storedKeyHex);
+            } else {
+                // If no key exists, generate new one and store it
+                const { key, keyHex } = await generateAESKey();
+                setAesKey(key);
+                setAesKeyHex(keyHex);
+                localStorage.setItem("aesKeyHex", keyHex);
+            }
         })();
     }, []);
 
@@ -211,29 +232,55 @@ export default function FileUploader() {
 
     //brower-side rendering
     return (
-        <div className="p-4">
-            <h2 className="text-xl font-semibold mb-4">Upload Files</h2>
-            <input
-                type="file"
-                onChange={handleUpload}
-                multiple
-                className="mb-4"
-                disabled={isUploading}
-            />
-
-            {uploadedFiles.length > 0 && (
-                <ul className="space-y-2">
-                    {uploadedFiles.map((file) => (
-                        <li key={file.cid} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                            <span>{file.name}</span>
-                            <div className="space-x-2">
-                                <button onClick={() => downloadAndDecrypt(file.cid, file.iv, aesKeyHex)} > Download & Decrypt </button>
-                                <button onClick={() => handleDelete(file.cid)}> Delete </button>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-            )}
+        <div className="max-h-screen"> 
+            <div className="overflow-x-auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th className="px-4 py-2 text-left text-xs font-medium">
+                                File Name
+                            </th>
+                            <th className="px-4 py-2 text-left text-xs font-medium">
+                                Size
+                            </th>
+                            <th className="px-4 py-2 text-left text-xs font-medium">
+                                CID
+                            </th>
+                            <th className="px-4 py-2 text-right text-xs font-medium">
+                                <input
+                                    type="file"
+                                    onChange={handleUpload}
+                                    multiple
+                                    className="file:rounded-lg file:border-0 file:text-sm file:font-semibold"
+                                    disabled={isUploading}
+                                />
+                                {isUploading && <span className="text-blue-600 ml-2">Uploading...</span>}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {uploadedFiles.map((file) => (
+                            <tr key={file.cid}>
+                                <td className="px-4 py-2 whitespace-nowrap text-sm font-medium"> 
+                                    {file.name}
+                                </td>
+                                <td className="px-4 py-2 whitespace-nowrap text-sm">
+                                    {(file.size/1024).toFixed(1)} KB
+                                </td>
+                                <td className="px-4 py-2 whitespace-nowrap text-sm ">
+                                    {file.cid.substring(0, 8)}...
+                                </td>
+                                <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
+                                    <div className="flex gap-4"> 
+                                        <button onClick={() => downloadAndDecrypt(file.cid, file.iv, aesKeyHex)}>Download  </button>
+                                        <button onClick={() => handleDelete(file.cid)}> Delete </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

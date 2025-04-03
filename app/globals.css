@@ -2,28 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+.side-title {
+  display: flex;
+  justify-content: center;
+}
+
 @layer base {
   :root {
     /* hue, saturation, lightness; */
     --sage: 89 14% 52%;  /* #7d8f77 */
     --cream: 49 53% 76%;  /* #e2d8a3 */
-    --olive-light: 67 21% 57%; /* #a3aa7 */
     --olive-dark: 84 14% 45%; /* #6f7c68 */
 
 
-    --background: var(--olive-dark);
+    --background: 67 21% 57%;
     --foreground: 0 0% 100%;
-    --card: var(--sage);
+    --card: 89 14% 52%;;
     --card-foreground: 0 0% 100%;
-    --popover: var(--cream);
+    --popover: 49 53% 76%;;
     --popover-foreground: 0 0% 9%;
-    --primary: var(--sage);
+    --primary: 89 14% 52%;;
     --primary-foreground: 0 0% 100%;
-    --secondary: var(--olive-dark);
+    --secondary: 84 14% 45%;;
     --secondary-foreground: 0 0% 100%;
-    --muted: var(--cream);
+    --muted: 49 53% 76%;;
     --muted-foreground: 0 0% 45.1%;
-    --accent: var(--olive-dark);
+    --accent: 84 14% 45%;;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
@@ -39,19 +43,19 @@
   }
 
   .dark {
-    --background: var(--olive-dark);
+    --background: 84 14% 45%;;
     --foreground: 0 0% 100%;
-    --card: var(--sage);
+    --card: 89 14% 52%;;
     --card-foreground: 0 0% 100%;
-    --popover: var(--olive-dark);
+    --popover: 84 14% 45%;;
     --popover-foreground: 0 0% 100%;
-    --primary: var(--cream);
+    --primary: 49 53% 76%;;
     --primary-foreground: 0 0% 9%;
-    --secondary: var(--olive-dark);
+    --secondary: 84 14% 45%;;
     --secondary-foreground: 0 0% 100%;
-    --muted: var(--olive-dark);
-    --muted-foreground: var(--cream);
-    --accent: var(--sage);
+    --muted: 84 14% 45%;;
+    --muted-foreground: 49 53% 76%;;
+    --accent: 89 14% 52%;;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;

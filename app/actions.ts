@@ -19,7 +19,8 @@ export const signUpAction = async (formData: FormData) => {
     );
   }
 
-  const { error } = await supabase.auth.signUp({
+  // Sign up the user
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -27,17 +28,40 @@ export const signUpAction = async (formData: FormData) => {
     },
   });
 
+  console.log("Sign Up Response:", data, error); // Debugging log
+
   if (error) {
     console.error(error.code + " " + error.message);
     return encodedRedirect("error", "/sign-up", error.message);
-  } else {
+  }
+
+  // Handle case where user creation is pending email confirmation
+  if (!data.user) {
     return encodedRedirect(
       "success",
       "/sign-up",
-      "Thanks for signing up! Please procedeto storing your data.",
+      "Check your email to confirm your account before proceeding."
     );
   }
+
+  // Insert user data into user_profiles
+  const { error: profileError } = await supabase
+    .from("user_profiles")
+    .insert([{ id: data.user.id, email }]);
+
+  if (profileError) {
+    console.error("Error inserting into user_profiles:", profileError.message);
+    return encodedRedirect("error", "/sign-up", "Profile creation failed.");
+  }
+
+  return encodedRedirect(
+    "success",
+    "/sign-up",
+    "Thanks for signing up! Please proceed to storing your data.",
+  );
 };
+
+
 
 export const signInAction = async (formData: FormData) => {
   const email = formData.get("email") as string;
