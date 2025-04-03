@@ -1,4 +1,3 @@
-import DeployButton from "@/components/deploy-button";
 import HeaderAuth from "@/components/header-auth";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 
@@ -38,7 +37,6 @@ export default function RootLayout({
                   <div className="flex gap-5 items-center font-semibold">
                     <Link href={"/"}>CacheIt</Link>
                     <div className="flex items-center gap-2">
-                      <DeployButton />
                     </div>
                   </div>
                   {<HeaderAuth/>}
