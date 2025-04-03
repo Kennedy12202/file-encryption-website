@@ -4,20 +4,27 @@
 
 @layer base {
   :root {
-    --background: #3eb217;
-    --foreground: #3eb217;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
+    /* hue, saturation, lightness; */
+    --sage: 89 14% 52%;  /* #7d8f77 */
+    --cream: 49 53% 76%;  /* #e2d8a3 */
+    --olive-light: 67 21% 57%; /* #a3aa7 */
+    --olive-dark: 84 14% 45%; /* #6f7c68 */
+
+
+    --background: var(--olive-dark);
+    --foreground: 0 0% 100%;
+    --card: var(--sage);
+    --card-foreground: 0 0% 100%;
+    --popover: var(--cream);
+    --popover-foreground: 0 0% 9%;
+    --primary: var(--sage);
+    --primary-foreground: 0 0% 100%;
+    --secondary: var(--olive-dark);
+    --secondary-foreground: 0 0% 100%;
+    --muted: var(--cream);
     --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --accent: var(--olive-dark);
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 89.8%;
@@ -32,20 +39,20 @@
   }
 
   .dark {
-    --background: pink;
-    --foreground: #3eb217;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
+    --background: var(--olive-dark);
+    --foreground: 0 0% 100%;
+    --card: var(--sage);
+    --card-foreground: 0 0% 100%;
+    --popover: var(--olive-dark);
+    --popover-foreground: 0 0% 100%;
+    --primary: var(--cream);
     --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --secondary: var(--olive-dark);
+    --secondary-foreground: 0 0% 100%;
+    --muted: var(--olive-dark);
+    --muted-foreground: var(--cream);
+    --accent: var(--sage);
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 14.9%;
@@ -57,19 +64,6 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
-}
-.main {
-  background-color: #3eb217;
-}
-
-.flex gap-2 {
-  background-color: #6f7c68;
-  color: black;
-  display: flex;
-  justify-content: space-between;
-  align-items: stretch;
-  padding: 0 1rem;
-  gap: 2rem;
 }
 
 @layer components {

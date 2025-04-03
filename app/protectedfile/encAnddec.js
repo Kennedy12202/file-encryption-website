@@ -94,6 +94,25 @@ async function saveToSupabase(cid, keyHex, iv, fileName, fileSize) {
         throw new Error(`Supabase error: ${insertError.message}`);
     }
 }
+
+//delete file from Supabase
+async function deleteFile(cid) {
+    try {
+        // Delete from Supabase
+        const { error } = await supabase
+            .from('files')
+            .delete()
+            .match({ cid });
+
+        if (error) throw error;
+
+        return true;
+    } catch (error) {
+        console.error('Delete failed:', error);
+        throw error;
+    }
+}
+
 //allows the user to download the file from IPFS and decrypt it using the AES key 
 async function downloadAndDecrypt(cid, ivHex, keyHex) {
     try {
@@ -176,22 +195,41 @@ export default function FileUploader() {
             setIsUploading(false);
         }
     };
-//brower-side rendering
+
+    const handleDelete = async (cid) => {
+        try {
+            await deleteFile(cid);
+            setUploadedFiles(files => files.filter(file => file.cid !== cid));
+            localStorage.setItem('uploadedFiles',
+                JSON.stringify(uploadedFiles.filter(file => file.cid !== cid))
+            );
+        } catch (error) {
+            console.error('Delete failed:', error);
+            alert('Failed to delete file');
+        }
+    };
+
+    //brower-side rendering
     return (
         <div className="p-4">
-            <h2 className="text-xl font-semibold mb-4">Uploaded Files</h2>
-            <input type="file" onChange={handleUpload} multiple className="mb-4" disabled={isUploading} />
+            <h2 className="text-xl font-semibold mb-4">Upload Files</h2>
+            <input
+                type="file"
+                onChange={handleUpload}
+                multiple
+                className="mb-4"
+                disabled={isUploading}
+            />
+
             {uploadedFiles.length > 0 && (
-                <ul>
+                <ul className="space-y-2">
                     {uploadedFiles.map((file) => (
-                        <li key={file.cid}>
-                            {file.name}
-                            <button
-                                onClick={() => downloadAndDecrypt(file.cid, file.iv, aesKeyHex)}
-                                className="ml-2 px-2 py-1 bg-blue-500 text-white rounded"
-                            >
-                                Download & Decrypt
-                            </button>
+                        <li key={file.cid} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                            <span>{file.name}</span>
+                            <div className="space-x-2">
+                                <button onClick={() => downloadAndDecrypt(file.cid, file.iv, aesKeyHex)} > Download & Decrypt </button>
+                                <button onClick={() => handleDelete(file.cid)}> Delete </button>
+                            </div>
                         </li>
                     ))}
                 </ul>
