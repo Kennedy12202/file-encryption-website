@@ -11,7 +11,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "ChacheIt",
+  title: "CacheIt",
   description: "The cheapest way to store your files: CacheIt",
 };
 
@@ -46,10 +46,10 @@ export default function RootLayout({
                 {children}
               </div>
 
-              <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-4 py-4">
+              <footer className="w-full flex items-center justify-center border-t text-xs gap-4 py-4 bg-">
                 <p>
                   <a>
-                    Kennedy Cameron @2025
+                    Kennedy Cameron @2025 
                   </a>
                 </p>
                 <ThemeSwitcher />
