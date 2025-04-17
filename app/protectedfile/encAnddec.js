@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { uploadToPinata, encryptFile, saveToSupabase, deleteFile, generateAESKey, indexStoreAESKeys } from "@/lib/upnotaUtils";
+import { uploadToPinata, encryptFile, saveToSupabase, deleteFile, generateAESKey, indexStoreAESKeys, downloadAndDecrypt } from "@/lib/upnotaUtils";
 import secureLocalStorage from "react-secure-storage";
-import { initIndexedDB, getKeyHexFromIndexedDB } from "@/lib/upnotaUtils.js";  // Import the helper
+import { initIndexedDB } from "@/lib/upnotaUtils.js";
 import ShareButton from "@/components/shareButton";
 
 
