@@ -44,7 +44,7 @@ export default function ViewFile() {
       try {
         setStatus("Decrypting file...");
 
-        // Get AES key from URL fragment
+        // get AES key from URL fragment
         const hash = window.location.hash;
         const aesKeyFromUrl = new URLSearchParams(hash.slice(1)).get("key");
         if (!aesKeyFromUrl) {
@@ -52,7 +52,7 @@ export default function ViewFile() {
           return;
         }
 
-        // Decode the AES key from base64
+        // decode the AES key from base64
         const aesKeyBuffer = Uint8Array.from(atob(aesKeyFromUrl), c => c.charCodeAt(0));
         const aesKey = await window.crypto.subtle.importKey(
           "raw",
@@ -73,14 +73,14 @@ export default function ViewFile() {
         setFileBlobUrl(blobUrl);
         setFileMeta({ fileName, mimeType });
 
-        // ✅ Revoke URL after 15 minutes
+        // revoke URL after 15 minutes
         setTimeout(() => {
           URL.revokeObjectURL(blobUrl);
           setFileBlobUrl(null);
           setStatus("This preview link has expired.");
         }, 15 * 60 * 1000); // 15 minutes
 
-        // ✅ Invalidate token in DB after 15 minutes
+        // invalidate token in DB after 15 minutes
         setTimeout(async () => {
           await supabase
             .from("files")
