@@ -1,17 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { uploadToPinata, encryptFile, saveToSupabase, deleteFile, generateAESKey, indexStoreAESKeys, downloadAndDecrypt } from "@/lib/upnotaUtils";
+import { uploadToPinata, encryptFile, saveToSupabase, downloadAndDecrypt, deleteFile, generateAESKey, indexStoreAESKeys } from "@/lib/upnotaUtils";
 import secureLocalStorage from "react-secure-storage";
 import { initIndexedDB } from "@/lib/upnotaUtils.js";
-import ShareButton from "@/components/shareButton";
 
 
 export default function FileUploader() {
+    const [aesKey, setAesKey] = useState(null);
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [isUploading, setIsUploading] = useState(false);
 
-
+    // ensures file persistence of uploaded files
     useEffect(() => {
         const storedFiles = secureLocalStorage.getItem("uploadedFiles");
         if (storedFiles) {
@@ -25,8 +25,8 @@ export default function FileUploader() {
         }
     }, [uploadedFiles]);
 
-
     // handles the file upload process
+    // when a file is selected, it encrypts the file using the AES key, uploads it to Pinata, and saves the metadata to Supabase
     const handleUpload = async (event) => {
         try {
             setIsUploading(true);
@@ -44,8 +44,8 @@ export default function FileUploader() {
                     const { encryptedData, iv } = await encryptFile(file, key);
                     const cid = await uploadToPinata(encryptedData, file.name);
                     await indexStoreAESKeys(db, cid, keyHex);
-                    await saveToSupabase(cid, iv, file.name, file.size, file.type);
-                    return { name: file.name, cid, size: file.size, iv, keyHex };
+                    await saveToSupabase(cid, iv, file.name, file.size);
+                    return { name: file.name, cid, size: file.size, iv };
                 })
             );
 
@@ -58,17 +58,21 @@ export default function FileUploader() {
         }
     };
 
+
     const handleDelete = async (cid) => {
         try {
             await deleteFile(cid);
-            const updatedFiles = uploadedFiles.filter(file => file.cid !== cid);
-            setUploadedFiles(updatedFiles);
-            secureLocalStorage.setItem('uploadedFiles', JSON.stringify(updatedFiles));
+            const updatedFiles = uploadedFiles.filter(file => file.cid !== cid);  // Use the updated value
+            setUploadedFiles(updatedFiles);  // Update the state
+            secureLocalStorage.setItem('uploadedFiles', JSON.stringify(updatedFiles));  // Update the secure storage
         } catch (error) {
             console.error('Delete failed:', error);
             alert('Failed to delete file');
         }
     };
+
+    { !aesKey && <p className="text-sm text-gray-500">Initializing AES key...</p> }
+
 
     return (
         <div className="max-h-screen">
@@ -99,9 +103,8 @@ export default function FileUploader() {
                                 <td className="px-4 py-2 whitespace-nowrap text-sm">{file.cid.substring(0, 8)}...</td>
                                 <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
                                     <div className="flex gap-4">
-                                        <button onClick={() => downloadAndDecrypt(file.cid, file.iv)}>Download</button>
+                                        <button onClick={() => downloadAndDecrypt(file.cid, file.iv, aesKey)}>Download</button>
                                         <button onClick={() => handleDelete(file.cid)}>Delete</button>
-                                        <ShareButton cid={file.cid} iv={file.iv} keyHex={file.keyHex} />
                                     </div>
                                 </td>
                             </tr>
@@ -112,3 +115,4 @@ export default function FileUploader() {
         </div>
     );
 }
+
