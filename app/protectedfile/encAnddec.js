@@ -103,15 +103,16 @@ export default function FileUploader() {
                                                 try {
                                                     const shareUrl = await createShareLink(file);
                                                     const fullUrl = `${window.location.origin}/view/${shareUrl}`;
+                                                    const shareKeyUrl = `${fullUrl}#key=${file.keyHex}`; // Across device sharing
 
                                                     try {
-                                                        await navigator.clipboard.writeText(fullUrl);
-                                                        alert('Share link copied to clipboard! Link expires in 24 hours and can only be used once.');
+                                                        await navigator.clipboard.writeText(shareKeyUrl);
+                                                        alert('Share link copied! Note: Link expires in 5 seconds and can only be used once.');
                                                     } catch (clipboardError) {
                                                         console.error('Clipboard access denied:', clipboardError);
                                                         prompt(
-                                                            'Copy this share link (press Ctrl+C/Cmd+C):',
-                                                            fullUrl
+                                                            'Copy this share link (expires in 5 seconds):',
+                                                            shareKeyUrl
                                                         );
                                                     }
                                                 } catch (error) {

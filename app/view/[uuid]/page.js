@@ -17,6 +17,14 @@ export default function ViewSharedFile({ params }) {
     useEffect(() => {
         const fetchSharedFile = async () => {
             try {
+                // Extract key from URL fragment
+                const hashParams = new URLSearchParams(window.location.hash.slice(1));
+                const keyFromUrl = hashParams.get('key');
+
+                if (!keyFromUrl) {
+                    throw new Error('No decryption key found in URL');
+                }
+
                 const { data: shareLink, error: fetchError } = await supabase
                     .from('share_links')
                     .select('*')
@@ -27,46 +35,24 @@ export default function ViewSharedFile({ params }) {
                     throw new Error('Link not found');
                 }
 
-                // Check expiration
-                const now = new Date();
-                const expirationDate = new Date(shareLink.expiration_timestamp);
-                if (expirationDate < now) {
-                    // Delete expired link
-                    await supabase.from('share_links').delete().eq('id', uuid);
-                    throw new Error('This link has expired');
-                }
-
-                // Check access limits
-                if (shareLink.access_count >= shareLink.max_access_count) {
-                    // Delete overused link
-                    await supabase.from('share_links').delete().eq('id', uuid);
-                    throw new Error('This link has reached its maximum number of uses');
-                }
-
+                // Store the key temporarily
                 const shareKeys = JSON.parse(secureLocalStorage.getItem('shareKeys') || '{}');
-                const keyHex = shareKeys[uuid];
-                if (!keyHex) {
-                    throw new Error('Decryption key not found');
-                }
+                shareKeys[uuid] = keyFromUrl;
+                secureLocalStorage.setItem('shareKeys', JSON.stringify(shareKeys));
+
                 // Download and decrypt
-                await downloadAndDecrypt(shareLink.file_cid, shareLink.iv, keyHex);
-                // Update access count
-                const { error: updateError } = await supabase
+                await downloadAndDecrypt(shareLink.file_cid, shareLink.iv, keyFromUrl);
+
+                // Clean up after successful download
+                delete shareKeys[uuid];
+                secureLocalStorage.setItem('shareKeys', JSON.stringify(shareKeys));
+
+                // Mark as accessed
+                await supabase
                     .from('share_links')
-                    .update({
-                        access_count: shareLink.access_count + 1,
-                        accessed: shareLink.access_count + 1 >= shareLink.max_access_count
-                    })
+                    .delete()
                     .eq('id', uuid);
 
-                if (updateError) {
-                    throw new Error('Failed to update access status');
-                }
-                // Clean up key if this was the last allowed access
-                if (shareLink.access_count + 1 >= shareLink.max_access_count) {
-                    delete shareKeys[uuid];
-                    secureLocalStorage.setItem('shareKeys', JSON.stringify(shareKeys));
-                }
                 setStatus('success');
             } catch (error) {
                 console.error('Error:', error);
@@ -74,6 +60,7 @@ export default function ViewSharedFile({ params }) {
                 setStatus('error');
             }
         };
+
         fetchSharedFile();
     }, [uuid]);
 
