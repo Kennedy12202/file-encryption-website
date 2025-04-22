@@ -1,17 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { uploadToPinata, encryptFile, saveToSupabase, downloadAndDecrypt, deleteFile, generateAESKey, indexStoreAESKeys } from "@/lib/upnotaUtils";
+import { uploadToPinata, encryptFile, saveToSupabase, downloadAndDecrypt, deleteFile, generateAESKey, storeAESKey, createShareLink } from "@/lib/upnotaUtils";
 import secureLocalStorage from "react-secure-storage";
-import { initIndexedDB } from "@/lib/upnotaUtils.js";
 
 
 export default function FileUploader() {
-    const [aesKey, setAesKey] = useState(null);
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [isUploading, setIsUploading] = useState(false);
 
-    // ensures file persistence of uploaded files
+    // Ensures file persistence of uploaded files
     useEffect(() => {
         const storedFiles = secureLocalStorage.getItem("uploadedFiles");
         if (storedFiles) {
@@ -36,16 +34,14 @@ export default function FileUploader() {
                 return;
             }
 
-            const db = await initIndexedDB();
-
             const results = await Promise.all(
                 files.map(async (file) => {
                     const { key, keyHex } = await generateAESKey();
                     const { encryptedData, iv } = await encryptFile(file, key);
                     const cid = await uploadToPinata(encryptedData, file.name);
-                    await indexStoreAESKeys(db, cid, keyHex);
                     await saveToSupabase(cid, iv, file.name, file.size);
-                    return { name: file.name, cid, size: file.size, iv };
+                    await storeAESKey(cid, keyHex);
+                    return { name: file.name, cid, size: file.size, iv, keyHex };
                 })
             );
 
@@ -62,16 +58,14 @@ export default function FileUploader() {
     const handleDelete = async (cid) => {
         try {
             await deleteFile(cid);
-            const updatedFiles = uploadedFiles.filter(file => file.cid !== cid);  // Use the updated value
-            setUploadedFiles(updatedFiles);  // Update the state
-            secureLocalStorage.setItem('uploadedFiles', JSON.stringify(updatedFiles));  // Update the secure storage
+            const updatedFiles = uploadedFiles.filter(file => file.cid !== cid);  
+            setUploadedFiles(updatedFiles);
+            secureLocalStorage.setItem('uploadedFiles', JSON.stringify(updatedFiles)); 
         } catch (error) {
             console.error('Delete failed:', error);
             alert('Failed to delete file');
         }
     };
-
-    { !aesKey && <p className="text-sm text-gray-500">Initializing AES key...</p> }
 
 
     return (
@@ -91,11 +85,11 @@ export default function FileUploader() {
                                     className="file:rounded-lg file:border-0 file:text-sm file:font-semibold"
                                     disabled={isUploading}
                                 />
-                                {isUploading && <span className="text-blue-600 ml-2">Uploading...</span>}
+                                {isUploading && <span className="ml-2">Uploading...</span>}
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody>
                         {uploadedFiles.map((file) => (
                             <tr key={file.cid}>
                                 <td className="px-4 py-2 whitespace-nowrap text-sm font-medium">{file.name}</td>
@@ -103,8 +97,30 @@ export default function FileUploader() {
                                 <td className="px-4 py-2 whitespace-nowrap text-sm">{file.cid.substring(0, 8)}...</td>
                                 <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
                                     <div className="flex gap-4">
-                                        <button onClick={() => downloadAndDecrypt(file.cid, file.iv, aesKey)}>Download</button>
-                                        <button onClick={() => handleDelete(file.cid)}>Delete</button>
+                                        <button onClick={() => downloadAndDecrypt(file.cid, file.iv, file.keyHex)}> Download </button>
+                                        <button
+                                            onClick={async () => {
+                                                try {
+                                                    const shareUrl = await createShareLink(file);
+                                                    const fullUrl = `${window.location.origin}/view/${shareUrl}`;
+
+                                                    try {
+                                                        await navigator.clipboard.writeText(fullUrl);
+                                                        alert('Share link copied to clipboard! Link expires in 24 hours and can only be used once.');
+                                                    } catch (clipboardError) {
+                                                        console.error('Clipboard access denied:', clipboardError);
+                                                        prompt(
+                                                            'Copy this share link (press Ctrl+C/Cmd+C):',
+                                                            fullUrl
+                                                        );
+                                                    }
+                                                } catch (error) {
+                                                    console.error('Share failed:', error);
+                                                    alert('Failed to create share link: ' + error.message);
+                                                }
+                                            }}
+                                            className="px-3 py-1" > Share </button>
+                                        <button onClick={() => handleDelete(file.cid)}> Delete </button>
                                     </div>
                                 </td>
                             </tr>
