@@ -4,7 +4,6 @@ import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
 
-
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
@@ -15,45 +14,41 @@ export const metadata = {
   description: "The cheapest way to store your files: CacheIt",
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-
     <html lang="en" suppressHydrationWarning>
       <head>
-      <meta name="viewport" content="width=device-width, initial-scale= 10.0" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
       </head>
       <body className="bg-background text-foreground">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange >
+          disableTransitionOnChange>
+            
           <main className="min-h-screen flex flex-col">
-            <div className=" flex flex-col items-center">
+            <div className="flex-1 flex flex-col items-center">
               <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16 bg-background">
                 <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm ">
                   <div className="flex gap-5 items-center font-semibold">
                     <Link href={"/"}>CacheIt</Link>
-                    <div className="flex items-center gap-2">
-                    </div>
+                    <div className="flex items-center gap-2"></div>
                   </div>
-                  {<HeaderAuth/>}
+                  {<HeaderAuth />}
                 </div>
               </nav>
-              <div className="flex flex-col gap-8 max-w-5xl p-5">
+              <div className="flex-1 flex flex-col gap-8 max-w-5xl p-5 w-full">
                 {children}
               </div>
 
-              <footer className="w-full flex items-center justify-center border-t text-xs gap-4 py-4 bg-">
+              <footer className="w-full border-t py-2 flex items-center justify-center gap-4 text-xs">
                 <p>
-                  <a>
-                    Kennedy Cameron @2025 
-                  </a>
+                  <a>Kennedy Cameron @2025</a>
                 </p>
                 <ThemeSwitcher />
               </footer>
