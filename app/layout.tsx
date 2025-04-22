@@ -1,5 +1,6 @@
 import HeaderAuth from "@/components/header-auth";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
@@ -14,6 +15,7 @@ export const metadata = {
   description: "The cheapest way to store your files: CacheIt",
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -21,34 +23,34 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-      </head>
       <body className="bg-background text-foreground">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange>
-            
-          <main className="min-h-screen flex flex-col">
-            <div className="flex-1 flex flex-col items-center">
+          disableTransitionOnChange
+        >
+          <main className="min-h-screen flex flex-col items-center">
+            <div className="w-full flex flex-col gap-80 items-center">
               <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16 bg-background">
                 <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm ">
                   <div className="flex gap-5 items-center font-semibold">
                     <Link href={"/"}>CacheIt</Link>
-                    <div className="flex items-center gap-2"></div>
+                    <div className="flex items-center gap-2">
+                    </div>
                   </div>
-                  {<HeaderAuth />}
+                  {<HeaderAuth/>}
                 </div>
               </nav>
-              <div className="flex-1 flex flex-col gap-8 max-w-5xl p-5 w-full">
+              <div className="flex flex-col gap-8 max-w-5xl p-5">
                 {children}
               </div>
 
               <footer className="w-full border-t py-2 flex items-center justify-center gap-4 text-xs">
                 <p>
-                  <a>Kennedy Cameron @2025</a>
+                  <a>
+                    Kennedy Cameron @2025 
+                  </a>
                 </p>
                 <ThemeSwitcher />
               </footer>
