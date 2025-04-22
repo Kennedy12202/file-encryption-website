@@ -111,7 +111,7 @@ export default function FileUploader() {
                                                     } catch (clipboardError) {
                                                         console.error('Clipboard access denied:', clipboardError);
                                                         prompt(
-                                                            'Copy this share link (expires in 5 seconds):',
+                                                            'Copy this share link (expires in 30 seconds):',
                                                             shareKeyUrl
                                                         );
                                                     }
