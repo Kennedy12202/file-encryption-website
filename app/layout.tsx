@@ -1,7 +1,5 @@
 import HeaderAuth from "@/components/header-auth";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 
-import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
 
@@ -27,12 +25,8 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
       <body className="bg-backgground text-foreground">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+
+      
           <main className="min-h-screen flex flex-col items-center">
             <div className="w-full flex flex-col gap-80 items-center">
               <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16 bg-background">
@@ -48,18 +42,8 @@ export default function RootLayout({
               <div className="flex flex-col gap-8 max-w-5xl p-5">
                 {children}
               </div>
-
-              <footer className="w-full border-t py-2 flex items-center justify-center gap-4 text-xs">
-                <p>
-                  <a>
-                    Kennedy Cameron @2025 
-                  </a>
-                </p>
-                <ThemeSwitcher />
-              </footer>
             </div>
           </main>
-        </ThemeProvider>
       </body>
     </html>
   );
