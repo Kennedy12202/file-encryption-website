@@ -107,7 +107,7 @@ export default function FileUploader() {
 
                                                     try {
                                                         await navigator.clipboard.writeText(shareKeyUrl);
-                                                        alert('Share link copied! Note: Link expires in 5 seconds and can only be used once.');
+                                                        alert('Share link copied! Note: Link expires in 30 seconds and can only be used once.');
                                                     } catch (clipboardError) {
                                                         console.error('Clipboard access denied:', clipboardError);
                                                         prompt(
